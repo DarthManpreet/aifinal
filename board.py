@@ -26,13 +26,25 @@ class Board:
         else:
             self.state = new_state
 
-        #Keeps track of which player's move it is (i.e. 1 = Player 1 and 2 = Player 2)
+        #Keeps track of which player's move it is (i.e. 1 = Player `x` and 0 = Player `o`)
         if new_turn is None:
             self.turn = 1
         else:
             self.turn = new_turn
 
-        #Keeps track of whether the game is over
+
+        #Keeps track of whether there are any available moves to play.
+        if np.count_nonzero(self.state == 2) == 0:
+            self.full = True
+        else:
+            self.full = False
+
+
+        #Then checks if the game is in a goal state.
+        self.won = False
+        self.isWon()
+
+        #Legacy boolean, checks whether game is finished
         self.finished = False
 
     def __repr__(self):
@@ -70,7 +82,7 @@ class Board:
                np.count_nonzero(self.state[i, :] == 1) == self.size or \
                np.count_nonzero(self.state[:, i] == 0) == self.size or \
                np.count_nonzero(self.state[:, i] == 1) == self.size:
-                self.finished = True
+                self.won = True
 
         # Does the same check as above, but this time for the two
         # diagonals.
@@ -78,9 +90,9 @@ class Board:
            np.count_nonzero(np.diag(self.state) == 1) == self.size or \
            np.count_nonzero(np.diag(np.fliplr(self.state)) == 0) == self.size or \
            np.count_nonzero(np.diag(np.fliplr(self.state)) == 1) == self.size:
-            self.finished = True
+            self.won = True
 
-        return self.finished
+        return
 
     def moves(self):
         """
@@ -94,6 +106,11 @@ class Board:
         #Determine the indices of all empty squares
         empty_squares = np.argwhere(self.state == 2)
 
+        #If there's only one move left, set the board to finished.
+        #This makes sure we don't call this function again when we shouldn't.
+        if len(empty_squares) == 1:
+            self.full = True
+
         #Whose turn is it next?
         next_turn = None
 
@@ -105,7 +122,7 @@ class Board:
             #If it's player's 1 move, then mark with a X and mark turn as player 2's
             if self.turn == 1:
                 move[row][column] = 1
-                next_turn = 2
+                next_turn = 0
             else:
                 move[row][column] = 0 #Otherwise mark with a O and mark turn as player 1's
                 next_turn = 1
