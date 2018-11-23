@@ -13,13 +13,14 @@ class Board:
             1) new_state = Set the board to the new state provided
             2) new_turn = Whose turn is it?
         """
+        #If there's no specified board size, start with a 4x4 board
+        if size is None:
+            self.size = 4
+        else:
+            self.size = size
+
         #If there's no new state, start with an empty board
         if new_state is None:
-            #If there's no specified board size, start with a 4x4 board
-            if size is None:
-                self.size = 4
-            else:
-                self.size = size
             #0 represents O's, 1 represents X's, and 2 represents empty squares
             self.state = np.full((self.size, self.size), 2)
         else:
@@ -57,22 +58,21 @@ class Board:
         Checks if current board state is won by a player or not.
         First checks all rows and columns, then checks diagonal, and
         finally checks reverse diagonal. Does this by counting whether
-        the total number of `x` or `o` is equal to 4 or not. If it is,
-        return `True` as well as the player who won.
+        the total number of `x` or `o` is equal to `self.size` or not.
+        If it is, update `self.finished` to `True` and return bool.
         """
         for i in range(self.size):
             if np.count_nonzero(self.state[i, :] == 0) == self.size or \
                np.count_nonzero(self.state[i, :] == 1) == self.size or \
                np.count_nonzero(self.state[:, i] == 0) == self.size or \
                np.count_nonzero(self.state[:, i] == 1) == self.size:
-                return True, self.state[i][i]
+                self.finished = True
         if np.count_nonzero(np.diag(self.state) == 0) == self.size or \
-           np.count_nonzero(np.diag(self.state) == 1) == self.size:
-            return True, self.state[0][0]
-        if np.count_nonzero(np.diag(np.fliplr(self.state)) == 1) == self.size or \
+           np.count_nonzero(np.diag(self.state) == 1) == self.size or \
+           np.count_nonzero(np.diag(np.fliplr(self.state)) == 1) == self.size or \
            np.count_nonzero(np.diag(np.fliplr(self.state)) == 1) == self.size:
-            return True, self.state[0][self.size - 1]
-        return False, 2
+            self.finished = True
+        return self.finished
 
     def moves(self):
         """
@@ -93,6 +93,7 @@ class Board:
         for row,column in empty_squares:
             #Deep copy of the current state
             move = np.copy(self.state)
+            size = self.size
 
             #If it's player's 1 move, then mark with a X and mark turn as player 2's
             if self.turn == 1:
@@ -102,5 +103,5 @@ class Board:
                 move[row][column] = 0 #Otherwise mark with a O and mark turn as player 1's
                 next_turn = 1
 
-            possible_moves.append(Board(new_state=move,new_turn=next_turn))
+            possible_moves.append(Board(size=size, new_state=move, new_turn=next_turn))
         return possible_moves
