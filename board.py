@@ -61,17 +61,25 @@ class Board:
         the total number of `x` or `o` is equal to `self.size` or not.
         If it is, update `self.finished` to `True` and return bool.
         """
+
+        # Checks all rows and columns to see if the number of `0`'s and
+        # `1`'s is equal to the size of the board. If it is, that means
+        # the board is finished.
         for i in range(self.size):
             if np.count_nonzero(self.state[i, :] == 0) == self.size or \
                np.count_nonzero(self.state[i, :] == 1) == self.size or \
                np.count_nonzero(self.state[:, i] == 0) == self.size or \
                np.count_nonzero(self.state[:, i] == 1) == self.size:
                 self.finished = True
+
+        # Does the same check as above, but this time for the two
+        # diagonals.
         if np.count_nonzero(np.diag(self.state) == 0) == self.size or \
            np.count_nonzero(np.diag(self.state) == 1) == self.size or \
-           np.count_nonzero(np.diag(np.fliplr(self.state)) == 1) == self.size or \
+           np.count_nonzero(np.diag(np.fliplr(self.state)) == 0) == self.size or \
            np.count_nonzero(np.diag(np.fliplr(self.state)) == 1) == self.size:
             self.finished = True
+
         return self.finished
 
     def moves(self):
@@ -93,7 +101,6 @@ class Board:
         for row,column in empty_squares:
             #Deep copy of the current state
             move = np.copy(self.state)
-            size = self.size
 
             #If it's player's 1 move, then mark with a X and mark turn as player 2's
             if self.turn == 1:
@@ -103,5 +110,5 @@ class Board:
                 move[row][column] = 0 #Otherwise mark with a O and mark turn as player 1's
                 next_turn = 1
 
-            possible_moves.append(Board(size=size, new_state=move, new_turn=next_turn))
+            possible_moves.append(Board(size=self.size, new_state=move, new_turn=next_turn))
         return possible_moves
