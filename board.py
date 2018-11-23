@@ -6,7 +6,7 @@ class Board:
     """
     This class defines the board for 4x4 tic-tac toe.
     """
-    def __init__(self, new_state=None, new_turn=None):
+    def __init__(self, size=None, new_state=None, new_turn=None):
         """
         This method initializes the class
         Parameters:
@@ -15,8 +15,13 @@ class Board:
         """
         #If there's no new state, start with an empty board
         if new_state is None:
+            #If there's no specified board size, start with a 4x4 board
+            if size is None:
+                self.size = 4
+            else:
+                self.size = size
             #0 represents O's, 1 represents X's, and 2 represents empty squares
-            self.state = np.array([[2,2,2,2], [2,2,2,2], [2,2,2,2], [2,2,2,2]])
+            self.state = np.full((self.size, self.size), 2)
         else:
             self.state = new_state
 
@@ -28,7 +33,47 @@ class Board:
 
         #Keeps track of whether the game is over
         self.finished = False
-    
+
+    def __repr__(self):
+        """
+        Pretty prints board. Internally, the board uses `1` for `x`
+        and `0` for `o`. However, the board is printed using the expected
+        `x` and `o` characters.
+        """
+        boardstr = ""
+        for i in range(self.state.shape[0]):
+            for j in range(self.state.shape[1]):
+                if self.state[i][j] == 0:
+                    boardstr += "o "
+                elif self.state[i][j] == 1:
+                    boardstr += "x "
+                else:
+                    boardstr += "- "
+            boardstr += "\n"
+        return boardstr
+
+    def isWon(self):
+        """
+        Checks if current board state is won by a player or not.
+        First checks all rows and columns, then checks diagonal, and
+        finally checks reverse diagonal. Does this by counting whether
+        the total number of `x` or `o` is equal to 4 or not. If it is,
+        return `True` as well as the player who won.
+        """
+        for i in range(self.size):
+            if np.count_nonzero(self.state[i, :] == 0) == self.size or \
+               np.count_nonzero(self.state[i, :] == 1) == self.size or \
+               np.count_nonzero(self.state[:, i] == 0) == self.size or \
+               np.count_nonzero(self.state[:, i] == 1) == self.size:
+                return True, self.state[i][i]
+        if np.count_nonzero(np.diag(self.state) == 0) == self.size or \
+           np.count_nonzero(np.diag(self.state) == 1) == self.size:
+            return True, self.state[0][0]
+        if np.count_nonzero(np.diag(np.fliplr(self.state)) == 1) == self.size or \
+           np.count_nonzero(np.diag(np.fliplr(self.state)) == 1) == self.size:
+            return True, self.state[0][self.size - 1]
+        return False, 2
+
     def moves(self):
         """
         This method generates the list of possible moves that the
@@ -59,6 +104,3 @@ class Board:
 
             possible_moves.append(Board(new_state=move,new_turn=next_turn))
         return possible_moves
-    
-
-        
