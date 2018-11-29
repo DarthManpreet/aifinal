@@ -355,97 +355,97 @@ def choose_best_move(qtable, board, output_decision_process):
 
 # init board, with the size of the board being given as a hyper
 # parameter.
-tttboard = Board(BOARDSIZE, None, 0)
-
-# load qtable
-q_table = json_load(tttboard.size)
-
-# Make ITERATIONS number of moves.
-for i in range(ITERATIONS):
-
-    # With EPSILON probability make a random move.
-    if random.randint(0, 100) < EPSILON:
-        possible_moves = tttboard.moves()
-        random_move = random.randint(0, len(possible_moves)-1)
-        next_board = possible_moves[random_move]
-
-    # Otherwise, make the best move available.
-    else:
-        next_board = choose_best_move(q_table, tttboard, False)
-
-    # Update qtable after having made the move.
-    update(q_table, tttboard.state, next_board.state, next_board.turn)
-
-    # Update board configuration to the board containing the new move.
-    tttboard = next_board
-
-    # Check if the board configuration is in a won state
-    tttboard.isWon()
-
-    # If the board is full or in a won state then start the game
-    # over again, with the player who goes first being chosen at random.
-    if np.count_nonzero(tttboard.state == 2) == 0 or tttboard.won:
-        tttboard = Board(tttboard.size, None, random.randint(0, 1))
-
-print("Finished Training")
-
-json_save(q_table, tttboard.size)
-
-print("Finished Saving\nBeginning Self Play")
-
-###################################################
-# Demonstration of the AI playing against itself  #
-# ----------------------------------------------  #
-#                                                 #
-# Change 3rd parameter of choose_best_move from   #
-# False to True if you'd like to view the actions #
-# of the AI, and it's thought process.            #
-###################################################
-
-num_games = 0
-num_first_player_wins = 0
-num_second_player_wins = 0
-num_ties = 0
-first_player = random.randint(0, 1)
-board_play = Board(BOARDSIZE, None, first_player)
-
-# Have the AI play itself NUMSELFPLAY number of games to
-# demonstrate what the AI has learned. Each move made
-# is the best known move available in the position.
-while num_games < NUMSELFPLAY:
-
-    # Make best move in given position
-    board_play = choose_best_move(q_table, board_play, False)
-
-    # Check whether the board is in a winning state
-    board_play.isWon()
-
-    # If it is then increment number of games player, who won,
-    # and restart game with a random first player.
-    if board_play.won:
-        num_games += 1
-        # After a move is played the board turn flips. Thus, if
-        # the current turn is back to the first player, and the
-        # board state is in a win, this means the second player
-        # won.
-        if first_player == board_play.turn:
-            num_second_player_wins += 1
-        # If not, then the first player must have won.
-        else:
-            num_first_player_wins += 1
-        # Choose a random first player and start game over.
-        first_player = random.randint(0, 1)
-        board_play = Board(BOARDSIZE, None, first_player)
-    # If the board is full then increment games played,
-    # number of ties, and start another game with a random
-    # first player.
-    if np.count_nonzero(board_play.state == 2) == 0:
-        num_games += 1
-        num_ties += 1
-        first_player = random.randint(0, 1)
-        board_play = Board(BOARDSIZE, None, first_player)
-
-# Print out results of self-play
-print("Ties: ", num_ties)
-print("First Player Wins: ", num_first_player_wins)
-print("Second Player Wins: ", num_second_player_wins)
+# tttboard = Board(BOARDSIZE, None, 0)
+#
+# # load qtable
+# q_table = json_load(tttboard.size)
+#
+# # Make ITERATIONS number of moves.
+# for i in range(ITERATIONS):
+#
+#     # With EPSILON probability make a random move.
+#     if random.randint(0, 100) < EPSILON:
+#         possible_moves = tttboard.moves()
+#         random_move = random.randint(0, len(possible_moves)-1)
+#         next_board = possible_moves[random_move]
+#
+#     # Otherwise, make the best move available.
+#     else:
+#         next_board = choose_best_move(q_table, tttboard, False)
+#
+#     # Update qtable after having made the move.
+#     update(q_table, tttboard.state, next_board.state, next_board.turn)
+#
+#     # Update board configuration to the board containing the new move.
+#     tttboard = next_board
+#
+#     # Check if the board configuration is in a won state
+#     tttboard.isWon()
+#
+#     # If the board is full or in a won state then start the game
+#     # over again, with the player who goes first being chosen at random.
+#     if np.count_nonzero(tttboard.state == 2) == 0 or tttboard.won:
+#         tttboard = Board(tttboard.size, None, random.randint(0, 1))
+#
+# print("Finished Training")
+#
+# json_save(q_table, tttboard.size)
+#
+# print("Finished Saving\nBeginning Self Play")
+#
+# ###################################################
+# # Demonstration of the AI playing against itself  #
+# # ----------------------------------------------  #
+# #                                                 #
+# # Change 3rd parameter of choose_best_move from   #
+# # False to True if you'd like to view the actions #
+# # of the AI, and it's thought process.            #
+# ###################################################
+#
+# num_games = 0
+# num_first_player_wins = 0
+# num_second_player_wins = 0
+# num_ties = 0
+# first_player = random.randint(0, 1)
+# board_play = Board(BOARDSIZE, None, first_player)
+#
+# # Have the AI play itself NUMSELFPLAY number of games to
+# # demonstrate what the AI has learned. Each move made
+# # is the best known move available in the position.
+# while num_games < NUMSELFPLAY:
+#
+#     # Make best move in given position
+#     board_play = choose_best_move(q_table, board_play, False)
+#
+#     # Check whether the board is in a winning state
+#     board_play.isWon()
+#
+#     # If it is then increment number of games player, who won,
+#     # and restart game with a random first player.
+#     if board_play.won:
+#         num_games += 1
+#         # After a move is played the board turn flips. Thus, if
+#         # the current turn is back to the first player, and the
+#         # board state is in a win, this means the second player
+#         # won.
+#         if first_player == board_play.turn:
+#             num_second_player_wins += 1
+#         # If not, then the first player must have won.
+#         else:
+#             num_first_player_wins += 1
+#         # Choose a random first player and start game over.
+#         first_player = random.randint(0, 1)
+#         board_play = Board(BOARDSIZE, None, first_player)
+#     # If the board is full then increment games played,
+#     # number of ties, and start another game with a random
+#     # first player.
+#     if np.count_nonzero(board_play.state == 2) == 0:
+#         num_games += 1
+#         num_ties += 1
+#         first_player = random.randint(0, 1)
+#         board_play = Board(BOARDSIZE, None, first_player)
+#
+# # Print out results of self-play
+# print("Ties: ", num_ties)
+# print("First Player Wins: ", num_first_player_wins)
+# print("Second Player Wins: ", num_second_player_wins)

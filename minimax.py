@@ -174,7 +174,7 @@ def minimax(s, depth):
     for i in successors:
         scores.append(minimax_value(i, depth, -np.inf, np.Inf, True))
 
-    print(scores)
+    #print(scores)
 
     #Convert it into numpy array for tie breaking scenarios
     maxValue = max(scores)
@@ -186,13 +186,13 @@ def minimax(s, depth):
 
 
 #For testing purposes
-test = Board(size=3)
-print("Player: " + str(test.turn) + "'s Move")
-print("Board")
-print(test)
-
-while test.won is False and not test.full:
-    test = minimax(test, DEPTH)
-    print("Player: " + str(test.turn) + "'s Move")
-    print("Board")
-    print(test)
+# test = Board(size=3)
+# print("Player: " + str(test.turn) + "'s Move")
+# print("Board")
+# print(test)
+#
+# while test.won is False and not test.full:
+#     test = minimax(test, DEPTH)
+#     print("Player: " + str(test.turn) + "'s Move")
+#     print("Board")
+#     print(test)
