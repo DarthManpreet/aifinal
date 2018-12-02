@@ -2,9 +2,25 @@ from board import Board
 import numpy as np
 from random import shuffle
 
+#The depth limit for minimax search
 DEPTH=10
 
 def evaluate(s, player):
+    """
+    The heurisitics evaluation for the current state, given the current player.
+    The heurisitic adds 1 point if the current player has one marker in row, column,
+    or diagonal and the other 2 squares are empty. It gives it 50 points if there's 2
+    and infinity points if the game is a win. However, points are subtracted if the
+    opponent has markers with empty squares with the points deducted based on the same
+    scenarios as described for points given.
+    
+    Parameters:
+        1) s = the state of the board
+        2) player = the current player
+    
+    Returns:
+        1) score = the score for that given state
+    """
     score = 0
     opponent = int(not player)
 
@@ -87,9 +103,37 @@ def evaluate(s, player):
     return score
 
 def minimax(s, depth):
+    """
+    This method performs the minimax search given an initial state
+    and the depth.
+    
+    Parameters:
+        1) s = the initial state
+        2) depth = the depth limit
+    
+    Returns:
+        1) Best move to make given the initial state
+    """
     player = s.turn
 
     def minimax_value(state, depth, alpha, beta, maximize):
+        """
+        Determines the value of the given state in order to decide
+        which move the player should make next. This also implements
+        alpha-beta pruning with a depth-limited search.
+
+        Parameters:
+            1) state = the state to examine
+            2) depth = the current depth of the search
+            3) alpha = the alpha value for alpha-beta pruning
+            4) beta = the beta value for alpha-beta pruning
+            5) maximize = keep track whether it's MAX's turn or MIN's turn
+        
+        Returns:
+            1) The best score for the initial state
+        """
+
+        #Terminal test checks
         if (depth == 0) or (state.won) or (state.full):
             return evaluate(state, player)
             
@@ -106,6 +150,7 @@ def minimax(s, depth):
                     break
             return alpha
         else:
+            #MIN's move
             value = evaluate(state, player)
             for s in successors:
                 value = min(value, minimax_value(s, depth - 1, alpha, beta, True))
@@ -113,15 +158,12 @@ def minimax(s, depth):
                 if beta <= alpha:
                     break
             return beta
-        #return value
     
     #For all successors of the current state, evaluate their minimax values
     successors = s.moves()
     scores = []
     for i in successors:
         scores.append(minimax_value(i, depth, -np.inf, np.Inf, True))
-
-    #print(scores)
 
     #Convert it into numpy array for tie breaking scenarios
     maxValue = max(scores)
@@ -132,14 +174,16 @@ def minimax(s, depth):
     return successors[np.random.choice(indices)]
 
 
+"""
 #For testing purposes
-# test = Board(size=3)
-# print("Player: " + str(test.turn) + "'s Move")
-# print("Board")
-# print(test)
-#
-# while test.won is False and not test.full:
-#     test = minimax(test, DEPTH)
-#     print("Player: " + str(test.turn) + "'s Move")
-#     print("Board")
-#     print(test)
+test = Board(size=3)
+print("Player: " + str(test.turn) + "'s Move")
+print("Board")
+print(test)
+
+while test.won is False and not test.full:
+    test = minimax(test, DEPTH)
+    print("Player: " + str(test.turn) + "'s Move")
+    print("Board")
+    print(test)
+"""

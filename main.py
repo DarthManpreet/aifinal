@@ -2,19 +2,27 @@ from board import Board
 import minimax as Minimax
 import TicTacToe_RL as RL
 import random
+import pandas as pd
 import matplotlib.pyplot as plt
 
-
+#Number of trials
 TRIALS = 5
-ROUNDS = 10
 
+#Number of games player per trial
+GAMES = 10
+
+#Load Q-Table for RL
 q_table = RL.json_load(3)
 
+#Keep track of score
+trialWins = {}
 for t in range(TRIALS):
   roundWins = []
   print("=" * 30 + "Trial " + str(t+1) + "=" * 30)
   
-  for r in range(ROUNDS):
+  for r in range(GAMES):
+    #50% that Minimax (playing as X) goes first
+    #or RL (playing as O) goes first. 
     who_first = random.random()
 
     # 1 = Minimax, 0 = RL
@@ -23,74 +31,43 @@ for t in range(TRIALS):
     else:
       board = Board(size=3, new_turn=0)
 
-    board.isWon()
+    #While the game is not over
     while True:
+      #Minimax's move
       if board.turn == 1:
         board = Minimax.minimax(board, 10)
       else:
+        #RL's move
         board = RL.choose_best_move(q_table, board, False)
 
+      #Is the game over?
+      board.isWon()
       if board.won:
         if board.turn == 1:
-          #print("RL won!")
           roundWins.append("R")
         else:
-          #print("Minimax won!")
           roundWins.append("M")
         break
       elif board.full and board.won is False:
-        #print("It's a tie!")
         roundWins.append("T")
         break
   
+  #Print summary for trial
   print("Minimax Wins: " + str(roundWins.count("M")))
   print("RL Wins: " + str(roundWins.count("R")))
   print("Tied Games: " + str(roundWins.count("T")))
   print("=" * 67)
-    
-"""
-from board import Board
-import minimax as Minimax
-import TicTacToe_RL as RL
-import random
 
+  trialWins[t+1] = {"Minimax Wins": roundWins.count("M"), "RL Wins": roundWins.count("R"), "Tied": roundWins.count("T")}
 
-
-curr_board = Board(3, None)
-q_table = RL.json_load(curr_board.size)
-
-rand_turn = random.random()
-
-while curr_board.won is False and not curr_board.full:
-    if rand_turn > 0.5:
-      print("Minimax Player: " + str(curr_board.turn) + "'s Move")
-      curr_board = Minimax.minimax(curr_board, 10)
-    else:
-      print("RL Player: " + str(curr_board.turn) + "'s Move")
-      curr_board = RL.choose_best_move(q_table, curr_board, False)
-    print("Board")
-    print(curr_board)
-    if curr_board.won is True:
-      if rand_turn > 0.5:
-        print("Minimax won")
-      else:
-        print("RL won")
-    elif not curr_board.full:
-      if rand_turn > 0.5:
-        print("RL Player: " + str(curr_board.turn) + "'s Move")
-        curr_board = RL.choose_best_move(q_table, curr_board, False)
-      else:
-        print("Minimax Player: " + str(curr_board.turn) + "'s Move")
-        curr_board = Minimax.minimax(curr_board, 10)
-      print("Board")
-      print(curr_board)
-      if curr_board.won is True:
-        if rand_turn > 0.5:
-          print("RL won")
-        else:
-          print("Minimax won")
-      elif curr_board.full:
-        print("Its a tie!!!")
-    else:
-print("Its a tie!!")
-"""
+#Generate bar graph of the score
+pd.DataFrame(trialWins).T.plot(kind='bar')
+plt.figure(1)
+plt.title("Minimax vs Reinforcement Learning")
+plt.legend()
+plt.ylabel("Number of Games")
+plt.yticks(range(0, GAMES + 1, 1))
+plt.xticks(rotation=0)
+plt.xlabel("Number of Trials")
+plt.savefig("results.png")
+plt.clf()
