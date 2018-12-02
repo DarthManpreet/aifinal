@@ -23,6 +23,7 @@ for t in range(TRIALS):
     else:
       board = Board(size=3, new_turn=0)
 
+    board.isWon()
     while True:
       if board.turn == 1:
         board = Minimax.minimax(board, 10)
