@@ -6,7 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 #Number of trials
-TRIALS = 5
+TRIALS = 10
 
 #Number of games player per trial
 GAMES = 10
@@ -59,6 +59,26 @@ for t in range(TRIALS):
   print("=" * 67)
 
   trialWins[t+1] = {"Minimax Wins": roundWins.count("M"), "RL Wins": roundWins.count("R"), "Tied": roundWins.count("T")}
+
+#Calculate Average Games Won
+m = 0
+r = 0
+t = 0
+
+for index, rounds in trialWins.items():
+  for key, value in rounds.items():
+    if key == "Minimax Wins":
+      m += value
+    elif key == "RL Wins":
+      r += value
+    elif key == "Tied":
+      t += value
+
+print("=" * 30 + "Summary" + "=" * 30)
+print("Average wins for Minimax: " + str(round(m / TRIALS, 2)))
+print("Average wins for RL: " + str(round(r / TRIALS, 2)))
+print("Average games tied: " + str(round(t/ TRIALS, 2)))
+print("=" * 67)
 
 #Generate bar graph of the score
 pd.DataFrame(trialWins).T.plot(kind='bar')
